@@ -1,0 +1,30 @@
+version: '2'
+services:
+    nginx:
+        image: nginx:latest
+        volumes:
+            - ./config/nginx:/etc/nginx/conf.d
+            - ./src:/var/www/html
+        ports: 
+            - 80:80
+        links:
+            - webservice
+        restart: always
+    webservice:
+        image: vmdao/renper:v3
+        command: sh -c 'cd projects;npm install -g pm2; npm install; node app.js'
+        volumes: 
+            - ./src:/projects
+        tty: true
+        links:
+            - mysql
+        restart: always
+    mysql: 
+        image: mysql:latest
+        volumes: 
+            - ./data/db-data/mysql:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=123456
+            - MYSQL_DATABASE=project_selii
+        restart: always
+  
